@@ -9,6 +9,8 @@ import (
 const articleFolder = "storage/posts"
 const aboutFile = "storage/about/about.md"
 
+var PORT = os.Getenv("PORT")
+
 func main() {
 	postFs := os.DirFS(articleFolder)
 
@@ -35,9 +37,9 @@ func main() {
 		http.StripPrefix("/static/",
 			http.FileServer(http.Dir("public"))))
 
-	log.Println("server started at localhost:8787")
+	log.Println("server started at ", PORT)
 
-	http.ListenAndServe(":8787", nil)
+	http.ListenAndServe(PORT, nil)
 }
 
 func homeHandler(posts []Post, renderer *Renderer) http.HandlerFunc {
