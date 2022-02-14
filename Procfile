@@ -1,1 +1,1 @@
-web: bin/start-blog
+web: start-blog
