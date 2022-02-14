@@ -4,8 +4,6 @@ import (
 	"embed"
 	"html/template"
 	"io"
-
-	"github.com/gomarkdown/markdown/parser"
 )
 
 var (
@@ -14,8 +12,7 @@ var (
 )
 
 type Renderer struct {
-	templ    *template.Template
-	mdParser *parser.Parser
+	templ *template.Template
 }
 
 func NewRenderer() (*Renderer, error) {
@@ -24,19 +21,18 @@ func NewRenderer() (*Renderer, error) {
 		return nil, err
 	}
 
-	extensions := parser.CommonExtensions | parser.AutoHeadingIDs | parser.OrderedListStart | parser.NoEmptyLineBeforeBlock | parser.BackslashLineBreak
-	parser := parser.NewWithExtensions(extensions)
-
-	return &Renderer{templ, parser}, nil
+	return &Renderer{templ}, nil
 }
 
 func (pr *Renderer) RenderPost(w io.Writer, p Post) error {
-	vm := newVM(pr, []byte(p.Body))
-	data := struct{
+	vm := newVM([]byte(p.Body))
+
+	// representing data that is served in post page
+	data := struct {
 		Post
 		HTMLBody template.HTML
-	} {
-		Post: p,
+	}{
+		Post:     p,
 		HTMLBody: vm.HTMLBody,
 	}
 	return pr.templ.ExecuteTemplate(w, "blog.gohtml", data)
@@ -47,6 +43,6 @@ func (pr *Renderer) RenderIndex(w io.Writer, posts []Post) error {
 }
 
 func (pr *Renderer) RenderAbout(w io.Writer, body []byte) error {
-	vm := newVM(pr, body)
+	vm := newVM(body)
 	return pr.templ.ExecuteTemplate(w, "about.gohtml", vm)
 }

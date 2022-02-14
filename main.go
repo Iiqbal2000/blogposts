@@ -14,27 +14,22 @@ func main() {
 
 	posts, err := NewPostsFromFS(postFs)
 	if err != nil {
-		log.Fatal("failure when loading folder")
+		log.Fatal("failure when loading post folder: ", err.Error())
 	}
 
 	about, err := os.ReadFile(aboutFile)
 	if err != nil {
-		log.Fatal(err.Error())
+		log.Fatal("failure when read about file: ", err.Error())
 	}
 
 	renderer, err := NewRenderer()
 	if err != nil {
-		log.Fatal("Failure when initialization renderer", err)
+		log.Fatal("Failure when creating renderer: ", err.Error())
 	}
 
-	http.HandleFunc("/", func(rw http.ResponseWriter, r *http.Request) {
-		if err := renderer.RenderIndex(rw, posts); err != nil {
-			log.Fatal("Failure when rendering the index: ", err.Error())
-		}
-	})
-
-	http.Handle("/post/", http.StripPrefix("/post/", PostHandler(posts)))
-	http.Handle("/about", aboutHandler(about))
+	http.Handle("/", homeHandler(posts, renderer))
+	http.Handle("/post/", http.StripPrefix("/post/", postHandler(posts, renderer)))
+	http.Handle("/about", aboutHandler(about, renderer))
 
 	http.Handle("/static/",
 		http.StripPrefix("/static/",
@@ -45,28 +40,27 @@ func main() {
 	http.ListenAndServe(":8787", nil)
 }
 
-func aboutHandler(about []byte) http.HandlerFunc {
+func homeHandler(posts []Post, renderer *Renderer) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
-		renderer, err := NewRenderer()
-		if err != nil {
-			log.Fatal("Failure when initialization renderer")
+		if err := renderer.RenderIndex(rw, posts); err != nil {
+			log.Fatal("Failure when rendering the index: ", err.Error())
 		}
+	}
+}
 
-		err = renderer.RenderAbout(rw, about)
+func aboutHandler(about []byte, renderer *Renderer) http.HandlerFunc {
+	return func(rw http.ResponseWriter, r *http.Request) {
+		err := renderer.RenderAbout(rw, about)
 		if err != nil {
-			http.Error(rw, err.Error(), http.StatusInternalServerError)
+			http.Error(rw, "internal server error", http.StatusInternalServerError)
+			log.Fatal("Failure when rendering about page: ", err.Error())
 			return
 		}
 	}
 }
 
-func PostHandler(posts []Post) http.HandlerFunc {
+func postHandler(posts []Post, renderer *Renderer) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
-		renderer, err := NewRenderer()
-		if err != nil {
-			log.Fatal("Failure when initialization renderer")
-		}
-
 		for _, post := range posts {
 			if post.Slug == r.URL.Path {
 				if err := renderer.RenderPost(rw, post); err != nil {
