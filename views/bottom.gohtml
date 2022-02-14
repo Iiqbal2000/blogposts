@@ -1,34 +1,24 @@
 {{define "bottom"}}
 </main>
 
-<footer class="bg-white border-t border-gray-400 shadow">
-	<div class="container max-w-4xl mx-auto py-8">
-		<div class="w-full mx-auto flex flex-wrap px-8 justify-around">
-			<a class="inline-block text-gray-600 no-underline hover:text-gray-900 hover:text-underline py-1" href="#">Twitter</a>
-			<a class="inline-block text-gray-600 no-underline hover:text-gray-900 hover:text-underline py-1" href="#">Github</a>
-			<a class="inline-block text-gray-600 no-underline hover:text-gray-900 hover:text-underline py-1" href="#">Linkedin</a>
+<footer>
+	<div class="container-footer">
+		<div class="container-footer-ch">
+			<a href="#">Twitter</a>
+			<a href="#">Github</a>
+			<a href="#">Linkedin</a>
 		</div>
 	</div>
 </footer>
 
 <script>
-		/* Progress bar */
-		//Source: https://alligator.io/js/progress-bar-javascript-css-variables/
-		var h = document.documentElement,
-			b = document.body,
-			st = 'scrollTop',
-			sh = 'scrollHeight',
-			progress = document.querySelector('#progress'),
-			scroll;
+		var st = 'scrollTop',
+			sh = 'scrollHeight';
 		var scrollpos = window.scrollY;
-		var header = document.getElementById("header");
+		var header = document.getElementById("nav");
 		var navcontent = document.getElementById("nav-content");
 
 		document.addEventListener('scroll', function() {
-
-			/*Refresh scroll % width*/
-			scroll = (h[st] || b[st]) / ((h[sh] || b[sh]) - h.clientHeight) * 100;
-			progress.style.setProperty('--scroll', scroll + '%');
 
 			/*Apply classes for slide in bar*/
 			scrollpos = window.scrollY;

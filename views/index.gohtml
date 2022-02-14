@@ -1,17 +1,18 @@
 {{template "top" .}}
-<div class="container w-full md:max-w-3xl mx-auto py-28">
+<div class="container-card">
 {{range .}}
-<div class="max-w-4xl px-10 my-5 py-6 bg-white rounded-lg shadow-md" style="font-family:Georgia,serif;">
-        <div class="flex justify-between items-center">
-            <p class="text-sm md:text-base font-normal text-gray-600">Published 19 February 2019</p>
-            <a class="px-2 py-1 bg-gray-600 text-gray-100 font-bold rounded hover:bg-gray-500" href="#">Design</a>
+    <div class="card">
+        <div class="date-post-index">
+            <p>Published 19 February 2019</p>
         </div>
-        <div class="mt-2">
-            <a class="font-sans text-2xl text-gray-900 font-bold hover:text-gray-600" href="/post/{{.Slug}}">{{.Title}}</a>
-            <p class="mt-2 text-lg text-gray-800">{{.Description}}</p>
+        <div class="post-index-sec">
+            <a href="/post/{{.Slug}}">{{.Title}}</a>
+            <p>{{.Description}}</p>
         </div>
-        <div class="flex justify-between items-center mt-4">
-            <a class="text-blue-600 hover:underline" href="/post/{{.Slug}}">Read more</a>
+        <div class="post-tags">
+            {{range .Tags}}
+                <a href="#" class="post-tags__link button"><span>#</span>{{.}}</a>
+            {{end}}
         </div>
     </div>
 {{end}}

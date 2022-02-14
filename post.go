@@ -41,7 +41,6 @@ func newPost(postFile io.Reader) (Post, error) {
 
 func (p *Post) setSlug() {
 	slug := new(strings.Builder)
-	// randTime := time.Now().UnixNano()
 
 	fmt.Fprintf(slug, "%s", strings.ToLower(strings.Replace(p.Title, " ", "-", -1)))
 

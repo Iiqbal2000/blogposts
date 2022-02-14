@@ -1,18 +1,10 @@
 package main
 
 import (
-	"errors"
-	"io/fs"
 	"reflect"
 	"testing"
 	"testing/fstest"
 )
-
-type StubFailingFS struct{}
-
-func (s StubFailingFS) Open(name string) (fs.File, error) {
-	return nil, errors.New("oh no, i always fail")
-}
 
 func TestNewBlogPosts(t *testing.T) {
 	const (
@@ -24,13 +16,12 @@ Hello
 World`
 		secondBody = `Title: Post 2
 Description: Description 2
-Tags: rust, borrow-checker
+Tags: rust
 ---
-B
-L
-M`
+BLM`
 	)
 
+	// represent storage
 	fs := fstest.MapFS{
 		"hello world.md":  {Data: []byte(firstBody)},
 		"hello-world2.md": {Data: []byte(secondBody)},
@@ -48,6 +39,14 @@ M`
 		Tags:        []string{"tdd", "go"},
 		Body: `Hello
 World`,
+	})
+
+	assertPost(t, posts[1], Post{
+		Title:       "Post 2",
+		Slug:        "post-2",
+		Description: "Description 2",
+		Tags:        []string{"rust"},
+		Body:        `BLM`,
 	})
 }
 

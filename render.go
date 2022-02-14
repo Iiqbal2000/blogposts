@@ -5,49 +5,48 @@ import (
 	"html/template"
 	"io"
 
-	"github.com/gomarkdown/markdown"
 	"github.com/gomarkdown/markdown/parser"
 )
 
 var (
 	//go:embed "views/*"
-	postTemplate embed.FS
+	templates embed.FS
 )
 
-type PostRenderer struct {
+type Renderer struct {
 	templ    *template.Template
 	mdParser *parser.Parser
 }
 
-func NewPostRenderer() (*PostRenderer, error) {
-	templ, err := template.ParseFS(postTemplate, "views/*.gohtml")
+func NewRenderer() (*Renderer, error) {
+	templ, err := template.ParseFS(templates, "views/*.gohtml")
 	if err != nil {
 		return nil, err
 	}
 
-	extensions := parser.CommonExtensions | parser.AutoHeadingIDs
+	extensions := parser.CommonExtensions | parser.AutoHeadingIDs | parser.OrderedListStart | parser.NoEmptyLineBeforeBlock | parser.BackslashLineBreak
 	parser := parser.NewWithExtensions(extensions)
 
-	return &PostRenderer{templ, parser}, nil
+	return &Renderer{templ, parser}, nil
 }
 
-func (pr *PostRenderer) Render(w io.Writer, p Post) error {
-	vm := newPostVM(p, pr)
-	return pr.templ.ExecuteTemplate(w, "blog.gohtml", vm)
+func (pr *Renderer) RenderPost(w io.Writer, p Post) error {
+	vm := newVM(pr, []byte(p.Body))
+	data := struct{
+		Post
+		HTMLBody template.HTML
+	} {
+		Post: p,
+		HTMLBody: vm.HTMLBody,
+	}
+	return pr.templ.ExecuteTemplate(w, "blog.gohtml", data)
 }
 
-func (pr *PostRenderer) RenderIndex(w io.Writer, posts []Post) error {
+func (pr *Renderer) RenderIndex(w io.Writer, posts []Post) error {
 	return pr.templ.ExecuteTemplate(w, "index.gohtml", posts)
 }
 
-type postViewModel struct {
-	Post
-	HTMLBody template.HTML
-}
-
-func newPostVM(p Post, r *PostRenderer) postViewModel {
-	vm := postViewModel{Post: p}
-
-	vm.HTMLBody = template.HTML(markdown.ToHTML([]byte(p.Body), r.mdParser, nil))
-	return vm
+func (pr *Renderer) RenderAbout(w io.Writer, body []byte) error {
+	vm := newVM(pr, body)
+	return pr.templ.ExecuteTemplate(w, "about.gohtml", vm)
 }
