@@ -1,1 +1,1 @@
-web: ./start-blog
+web: blogposts
