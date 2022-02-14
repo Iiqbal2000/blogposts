@@ -39,7 +39,7 @@ func main() {
 
 	log.Println("server started at ", PORT)
 
-	if err := http.ListenAndServe(PORT, nil); err != nil {
+	if err := http.ListenAndServe(":" + PORT, nil); err != nil {
 		log.Fatal("Server error: ", err.Error())
 	}
 }
