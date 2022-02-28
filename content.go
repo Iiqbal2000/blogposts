@@ -8,15 +8,20 @@ import (
 	"github.com/microcosm-cc/bluemonday"
 )
 
-type viewModel struct {
+// Content represents content that is ready to serve
+type Content struct {
+	Post
 	HTMLBody template.HTML
 }
 
-// translate to HTML and sanitize it
-func newVM(body []byte) *viewModel {
+func (c *Content) toHTML(body []byte) template.HTML {
 	extensions := parser.CommonExtensions | parser.AutoHeadingIDs | parser.OrderedListStart | parser.NoEmptyLineBeforeBlock | parser.BackslashLineBreak
 	p := parser.NewWithExtensions(extensions)
-	rawHtml := markdown.ToHTML([]byte(body), p, nil)
-	sanitized := bluemonday.UGCPolicy().SanitizeBytes(rawHtml)
-	return &viewModel{HTMLBody: template.HTML(sanitized)}
+	rawHtml := markdown.ToHTML(body, p, nil)
+	return template.HTML(rawHtml)
+}
+
+func (c *Content) sanitize(html template.HTML) {
+	safeHtml := bluemonday.UGCPolicy().Sanitize(string(html))
+	c.HTMLBody = template.HTML(safeHtml)
 }
