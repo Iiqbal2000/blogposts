@@ -9,7 +9,6 @@ func NewPostsFromFS(fileSystem fs.FS) ([]Post, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	var posts []Post
 
 	for _, f := range dirs {

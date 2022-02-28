@@ -1,29 +1,46 @@
 package main
 
 import (
+	"io/fs"
 	"log"
 	"net/http"
 	"os"
 )
 
-const postFolder = "storage/posts"
-const aboutFile = "storage/about/about.md"
+const storageFolder = "storage"
+const postFolder = "posts"
+const aboutFolder = "about"
+const aboutFileName = "about.md"
 
 var PORT = os.Getenv("PORT")
 var defaultPort = "8787"
+
 func main() {
 	if PORT == "" {
 		PORT = defaultPort
 	}
+	
+	// create storage Folder as filesystem
+	filesystem := os.DirFS(storageFolder)
+	
+	// create post Folder as sub filesystem of storage
+	postFs, err := fs.Sub(filesystem, postFolder)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 
-	postFs := os.DirFS(postFolder)
+	// create about Folder as sub filesystem of storage
+	aboutFs, err := fs.Sub(filesystem, aboutFolder)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 
 	posts, err := NewPostsFromFS(postFs)
 	if err != nil {
 		log.Fatal("failure when loading post folder: ", err.Error())
 	}
 
-	about, err := os.ReadFile(aboutFile)
+	about, err := fs.ReadFile(aboutFs, aboutFileName)
 	if err != nil {
 		log.Fatal("failure when read about file: ", err.Error())
 	}
@@ -43,7 +60,7 @@ func main() {
 
 	log.Println("server started at", PORT)
 
-	if err := http.ListenAndServe(":" + PORT, nil); err != nil {
+	if err := http.ListenAndServe(":"+PORT, nil); err != nil {
 		log.Fatal("Server error: ", err.Error())
 	}
 }
