@@ -6,43 +6,45 @@ import (
 	"io"
 )
 
+// embed files that are in the views folder to program
 var (
 	//go:embed "views/*"
 	templates embed.FS
 )
 
-type Renderer struct {
+// Render represents a renderer to render a page
+type Render struct {
 	templ *template.Template
 }
 
-func NewRenderer() (*Renderer, error) {
+func NewRender() (*Render, error) {
 	templ, err := template.ParseFS(templates, "views/*.gohtml")
 	if err != nil {
 		return nil, err
 	}
 
-	return &Renderer{templ}, nil
+	return &Render{templ}, nil
 }
 
-func (pr *Renderer) RenderPost(w io.Writer, p Post) error {
-	vm := newVM([]byte(p.Body))
-
-	// representing data that is served in post page
-	data := struct {
-		Post
-		HTMLBody template.HTML
-	}{
-		Post:     p,
-		HTMLBody: vm.HTMLBody,
+func (r *Render) PostPage(w io.Writer, p Post) error {
+	content := &Content{
+		Post: p,
 	}
-	return pr.templ.ExecuteTemplate(w, "blog.gohtml", data)
+
+	html := content.toHTML([]byte(p.Body))
+	content.sanitize(html)
+
+	return r.templ.ExecuteTemplate(w, "blog.gohtml", content)
 }
 
-func (pr *Renderer) RenderIndex(w io.Writer, posts []Post) error {
-	return pr.templ.ExecuteTemplate(w, "index.gohtml", posts)
+func (r *Render) IndexPage(w io.Writer, posts []Post) error {
+	return r.templ.ExecuteTemplate(w, "index.gohtml", posts)
 }
 
-func (pr *Renderer) RenderAbout(w io.Writer, body []byte) error {
-	vm := newVM(body)
-	return pr.templ.ExecuteTemplate(w, "about.gohtml", vm)
+func (r *Render) AboutPage(w io.Writer, body []byte) error {
+	content := &Content{}
+	html := content.toHTML(body)
+	content.sanitize(html)
+
+	return r.templ.ExecuteTemplate(w, "about.gohtml", content)
 }
