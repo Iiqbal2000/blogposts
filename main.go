@@ -50,7 +50,7 @@ func main() {
 		log.Fatal("Failure when creating a render: ", err.Error())
 	}
 
-	http.Handle("/", homeHandler(posts, render))
+	http.Handle("/", indexHandler(posts, render))
 	http.Handle("/post/", http.StripPrefix("/post/", postHandler(posts, render)))
 	http.Handle("/about", aboutHandler(about, render))
 
@@ -65,10 +65,11 @@ func main() {
 	}
 }
 
-func homeHandler(posts []Post, render *Render) http.HandlerFunc {
+func indexHandler(posts []Post, render *Render) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 		if err := render.IndexPage(rw, posts); err != nil {
-			log.Fatal("Failure when rendering the index: ", err.Error())
+			log.Println("Failure when rendering the index: ", err.Error())
+			http.Error(rw, "internal server error", http.StatusInternalServerError)
 		}
 	}
 }
@@ -77,8 +78,8 @@ func aboutHandler(about []byte, render *Render) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 		err := render.AboutPage(rw, about)
 		if err != nil {
+			log.Println("Failure when rendering about page: ", err.Error())
 			http.Error(rw, "internal server error", http.StatusInternalServerError)
-			log.Fatal("Failure when rendering about page: ", err.Error())
 			return
 		}
 	}
@@ -89,13 +90,14 @@ func postHandler(posts []Post, render *Render) http.HandlerFunc {
 		for _, post := range posts {
 			if post.Slug == r.URL.Path {
 				if err := render.PostPage(rw, post); err != nil {
-					log.Fatal("Failure when rendering")
+					log.Println("Failure when rendering post page:", err.Error())
+					http.Error(rw, "internal server error", http.StatusInternalServerError)
+					return
 				}
 				return
 			}
 		}
 
-		rw.WriteHeader(http.StatusNotFound)
-		rw.Write([]byte("Not Found"))
+		http.Error(rw, "Not Found", http.StatusNotFound)
 	}
 }
