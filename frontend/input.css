@@ -63,7 +63,7 @@ nav {
 }
 
 .container-card .card {
-  @apply max-w-4xl px-10 my-5 py-6 bg-white rounded-lg shadow-md;
+  @apply max-w-4xl p-5 my-5 bg-white rounded-lg shadow-md;
   font-family:Georgia,serif;
 }
 
@@ -92,7 +92,7 @@ nav {
 }
 
 .post-tags a {
-  @apply text-center mr-5 p-1.5 bg-gray-100 hover:bg-gray-200 rounded-sm;
+  @apply text-center text-white mr-5 p-1 bg-gray-600 hover:bg-gray-500 rounded-sm;
 }
 
 .container-article {
