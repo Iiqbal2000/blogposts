@@ -14,6 +14,7 @@ type Content struct {
 	HTMLBody template.HTML
 }
 
+// toHTML converts markdown to html syntax
 func (c *Content) toHTML(body []byte) template.HTML {
 	extensions := parser.CommonExtensions | parser.AutoHeadingIDs | parser.OrderedListStart | parser.NoEmptyLineBeforeBlock | parser.BackslashLineBreak
 	p := parser.NewWithExtensions(extensions)
@@ -21,6 +22,7 @@ func (c *Content) toHTML(body []byte) template.HTML {
 	return template.HTML(rawHtml)
 }
 
+// sanitize cleans bad html syntax
 func (c *Content) sanitize(html template.HTML) {
 	safeHtml := bluemonday.UGCPolicy().Sanitize(string(html))
 	c.HTMLBody = template.HTML(safeHtml)
