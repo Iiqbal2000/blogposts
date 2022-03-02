@@ -13,7 +13,6 @@ func TestRender(t *testing.T) {
 		aPost = Post{
 			Title:       "hello world",
 			Slug:        "hello-world",
-			Description: "This is a description",
 			Tags:        []string{"go", "tdd"},
 			Body:        "## This is a post",
 		}
@@ -52,7 +51,6 @@ func BenchmarkRender(b *testing.B) {
 			Title:       "hello world",
 			Slug:        "hello-world",
 			Body:        "This is a post",
-			Description: "This is a description",
 			Tags:        []string{"go", "tdd"},
 		}
 	)

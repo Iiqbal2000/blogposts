@@ -12,13 +12,12 @@ import (
 
 const (
 	titleSeparator       = "Title: "
-	descriptionSeparator = "Description: "
 	tagsSeparator        = "Tags: "
 	dateSeparator        = "Date: "
 )
 
 type Post struct {
-	Title, Description, Body, Slug, Date string
+	Title, Body, Slug, Date string
 	Tags                                 []string
 }
 
@@ -32,7 +31,6 @@ func newPost(postFile io.Reader) (Post, error) {
 
 	post := Post{
 		Title:       readMetaLine(titleSeparator),
-		Description: readMetaLine(descriptionSeparator),
 		Tags:        strings.Split(readMetaLine(tagsSeparator), ", "),
 		Date:        restructureDate(readMetaLine(dateSeparator)),
 		Body:        readBodyLine(scanner),
