@@ -1,4 +1,4 @@
-module github.com/iqbal2000/blogposts
+module github.com/iqbal2000/blogpost
 
 // +heroku goVersion go1.17
 go 1.17
